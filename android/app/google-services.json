@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "706057096800",
+    "project_id": "cp-movies",
+    "storage_bucket": "cp-movies.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:706057096800:android:fa2d47ae73bec33ce43d05",
+        "android_client_info": {
+          "package_name": "com.example.cp_movies"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9dMXzd_h5G_J-t3GpVqg7IltSkitupW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

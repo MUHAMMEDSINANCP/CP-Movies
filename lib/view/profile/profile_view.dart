@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cp_movies/view/login/login_view.dart';
 import 'package:fbroadcast/fbroadcast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -14,6 +17,26 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
+  String firstname = "";
+  String lastName = "";
+  String email = "";
+
+  void fetchUserName() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      setState(() {
+        firstname = userSnapshot['name'] ?? 'First Name';
+        lastName = userSnapshot['last_name'] ?? 'Last Name';
+        email = userSnapshot['email'] ?? 'Email';
+      });
+    }
+  }
+
   final ImagePicker picker = ImagePicker();
   XFile? image;
 
@@ -42,7 +65,7 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   void initState() {
-    // TODO: implement initState
+    fetchUserName();
     super.initState();
     FBroadcast.instance().register("change_mode", (value, callback) {
       if (mounted) {
@@ -116,10 +139,48 @@ class _ProfileViewState extends State<ProfileView> {
                               : ClipRRect(
                                   borderRadius:
                                       BorderRadius.circular(media.width * 0.15),
-                                  child: Image.asset(
-                                    "assets/img/user_placeholder.png",
-                                    width: media.width * 0.28,
-                                    height: media.width * 0.28,
+                                  child: FutureBuilder<DocumentSnapshot>(
+                                    future: FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(FirebaseAuth
+                                            .instance.currentUser!.uid)
+                                        .get(),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<DocumentSnapshot>
+                                            snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        if (snapshot.hasData) {
+                                          var userData = snapshot.data!.data()
+                                              as Map<String, dynamic>?;
+
+                                          if (userData != null &&
+                                              userData.containsKey(
+                                                  'profile_image') &&
+                                              userData['profile_image'] !=
+                                                  null &&
+                                              userData['profile_image']
+                                                  .toString()
+                                                  .isNotEmpty) {
+                                            String profileImage =
+                                                userData['profile_image']
+                                                    as String;
+                                            return Image.network(
+                                              profileImage,
+                                              width: media.width * 0.28,
+                                              height: media.width * 0.28,
+                                              fit: BoxFit.cover,
+                                            );
+                                          }
+                                        }
+                                      }
+                                      // If no profile image URL is available or it's null/empty, show a placeholder
+                                      return Image.asset(
+                                        "assets/img/user_placeholder.png",
+                                        width: media.width * 0.28,
+                                        height: media.width * 0.28,
+                                      );
+                                    },
                                   ),
                                 ),
                         ),
@@ -129,14 +190,14 @@ class _ProfileViewState extends State<ProfileView> {
                       height: 25,
                     ),
                     Text(
-                      "Code For Any",
+                      "$firstname $lastName",
                       style: TextStyle(
                           color: TColor.bgText,
                           fontSize: 27,
                           fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      "Premium",
+                      email,
                       style: TextStyle(
                         color: TColor.primary2,
                         fontSize: 15,
@@ -155,26 +216,33 @@ class _ProfileViewState extends State<ProfileView> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              mObj["image"].toString(),
-                              width: 20,
-                              height: 20,
-                              color: TColor.text,
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            Text(
-                              mObj["name"].toString(),
-                              style: TextStyle(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (mObj["name"] == "Logout") {
+                              confirmLogout();
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                mObj["image"].toString(),
+                                width: 20,
+                                height: 20,
                                 color: TColor.text,
-                                fontSize: 15,
                               ),
-                            )
-                          ],
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                mObj["name"].toString(),
+                                style: TextStyle(
+                                  color: TColor.text,
+                                  fontSize: 15,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -188,6 +256,77 @@ class _ProfileViewState extends State<ProfileView> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> confirmLogout() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(
+                  fontSize: 18.0,
+                  color: Colors.black, // Default color for text
+                ),
+                children: <TextSpan>[
+                  const TextSpan(
+                    text: 'Logout from ',
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: 'CP Movies',
+                    style: TextStyle(
+                      color: TColor.primary1, // Change color to yellow
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          content: const Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Perform logout logic here
+                await FirebaseAuth.instance.signOut();
+
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
+
+                if (mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginView(),
+                    ),
+                  );
+                }
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

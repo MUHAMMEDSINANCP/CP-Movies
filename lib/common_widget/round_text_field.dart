@@ -10,16 +10,21 @@ class RoundTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? left;
   final Widget? right;
+  final String? Function(String?)? validator;
+  final Widget? suffixIcon;
 
-  const RoundTextField(
-      {super.key,
-      required this.title,
-      this.controller,
-      this.hintText,
-      this.keyboardType,
-      this.obscureText = false,
-      this.left,
-      this.right});
+  const RoundTextField({
+    super.key,
+    required this.title,
+    this.controller,
+    this.hintText,
+    this.keyboardType,
+    this.obscureText = false,
+    this.left,
+    this.right,
+    this.validator,
+    this.suffixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,36 +48,48 @@ class RoundTextField extends StatelessWidget {
                   color: Colors.black12, blurRadius: 6, offset: Offset(0, 4))
             ],
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Stack(
+            alignment: Alignment.centerRight,
             children: [
-              left ?? const SizedBox(),
-              Expanded(
-                child: TextField(
-                  style: TextStyle(
-                      color:
-                          TColor.tModeDark ? TColor.primary1 : TColor.primary2),
-                  controller: controller,
-                  autocorrect: false,
-                  obscureText: obscureText,
-                  cursorColor:
-                      TColor.tModeDark ? TColor.primary1 : TColor.primary2,
-                  obscuringCharacter: "*",
-                  keyboardType: keyboardType,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: hintText,
-                    hintStyle: TextStyle(
-                        color: TColor.subtext,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w400),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  left ?? const SizedBox(),
+                  Expanded(
+                    child: TextFormField(
+                      validator: validator,
+                      style: TextStyle(
+                          color: TColor.tModeDark
+                              ? TColor.primary1
+                              : TColor.primary2),
+                      controller: controller,
+                      autocorrect: false,
+                      obscureText: obscureText,
+                      cursorColor:
+                          TColor.tModeDark ? TColor.primary1 : TColor.primary2,
+                      obscuringCharacter: "*",
+                      keyboardType: keyboardType,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0, horizontal: 15),
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        hintText: hintText,
+                        hintStyle: TextStyle(
+                            color: TColor.subtext,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ),
                   ),
-                ),
+                  right ?? const SizedBox()
+                ],
               ),
-              right ?? const SizedBox()
+              if (suffixIcon != null)
+                Positioned(
+                  right: 78, // Adjust this value as needed
+                  child: suffixIcon!,
+                ),
             ],
           ),
         )
