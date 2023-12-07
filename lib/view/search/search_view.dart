@@ -42,8 +42,7 @@ class _SearchViewState extends State<SearchView> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+     super.initState();
     FBroadcast.instance().register("change_mode", (value, callback) {
       if (mounted) {
         setState(() {});

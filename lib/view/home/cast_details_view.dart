@@ -32,7 +32,6 @@ class _CastDetailsViewState extends State<CastDetailsView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FBroadcast.instance().register("change_mode", (value, callback) {
       if (mounted) {

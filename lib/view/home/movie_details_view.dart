@@ -201,6 +201,7 @@ class _MovieDetailsViewState extends State<MovieDetailsView> {
                       empty: Image.asset("assets/img/star.png"),
                     ),
                     onRatingUpdate: (rating) {
+                      // ignore: avoid_print
                       print(rating);
                     },
                   ),

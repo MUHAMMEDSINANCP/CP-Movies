@@ -58,8 +58,7 @@ class _TvShowDetailsViewState extends State<TvShowDetailsView> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+     super.initState();
     FBroadcast.instance().register("change_mode", (value, callback) {
       if (mounted) {
         setState(() {});
@@ -217,6 +216,7 @@ class _TvShowDetailsViewState extends State<TvShowDetailsView> {
                       empty: Image.asset("assets/img/star.png"),
                     ),
                     onRatingUpdate: (rating) {
+                      // ignore: avoid_print
                       print(rating);
                     },
                   ),

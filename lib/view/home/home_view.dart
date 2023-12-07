@@ -95,6 +95,7 @@ class _HomeViewState extends State<HomeView> {
                         empty: Image.asset("assets/img/star.png"),
                       ),
                       onRatingUpdate: (rating) {
+                        // ignore: avoid_print
                         print(rating);
                       },
                     ),
