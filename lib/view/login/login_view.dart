@@ -201,7 +201,7 @@ class _LoginViewState extends State<LoginView> {
                         controller: txtEmail,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your email.";
+                            return "Enter your email.";
                           }
                           return null;
                         },
@@ -231,7 +231,7 @@ class _LoginViewState extends State<LoginView> {
                         obscureText: !isPasswordVisible,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please enter your password.";
+                            return "Enter your password.";
                           }
                           return null;
                         },
